@@ -12,4 +12,9 @@ describe('RunsNeeded', () => {
     render(<RunsNeeded runsNeeded={1} />);
     expect(screen.getByText('run needed to take the lead')).toBeInTheDocument();
   });
+
+  it('has aria-live on the container', () => {
+    const { container } = render(<RunsNeeded runsNeeded={2} />);
+    expect(container.firstChild).toHaveAttribute('aria-live', 'polite');
+  });
 });

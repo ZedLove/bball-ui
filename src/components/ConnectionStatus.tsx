@@ -19,7 +19,7 @@ export function ConnectionStatus() {
   return (
     <div className="flex items-center gap-1.5 text-xs text-gray-400">
       <span className={`h-2 w-2 rounded-full ${dotColor[status]}`} aria-hidden="true" />
-      <span>{labels[status]}</span>
+      <span aria-live="polite">{labels[status]}</span>
     </div>
   );
 }

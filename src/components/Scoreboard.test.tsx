@@ -48,4 +48,10 @@ describe('Scoreboard', () => {
     expect(awayLabel.className).toContain('text-gray-400');
     expect(homeLabel.className).toContain('text-white');
   });
+
+  it('provides an accessible score description via aria-label', () => {
+    render(<Scoreboard update={makeUpdate()} />);
+    const scoreSection = screen.getByLabelText(/TOR.*NYM|NYM.*TOR/i);
+    expect(scoreSection).toBeInTheDocument();
+  });
 });

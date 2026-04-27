@@ -24,4 +24,10 @@ describe('ConnectionStatus', () => {
     render(<ConnectionStatus />);
     expect(screen.getByText('Disconnected')).toBeInTheDocument();
   });
+
+  it('has aria-live on the status text', () => {
+    render(<ConnectionStatus />);
+    const liveRegion = screen.getByText(/Live|Reconnecting|Disconnected/);
+    expect(liveRegion).toHaveAttribute('aria-live', 'polite');
+  });
 });

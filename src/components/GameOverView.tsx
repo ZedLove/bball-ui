@@ -7,7 +7,7 @@ interface GameOverViewProps {
 
 export function GameOverView({ update }: GameOverViewProps) {
   return (
-    <div className="flex flex-col items-center gap-8 py-6">
+    <div className="flex flex-col items-center gap-8 py-6" role="status" aria-label="Game over">
       <div className="flex items-center gap-3">
         <span className="px-2 py-1 rounded text-xs font-bold tracking-widest bg-gray-700 text-gray-200">
           FINAL

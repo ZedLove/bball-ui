@@ -16,10 +16,12 @@ export function Scoreboard({ update }: ScoreboardProps) {
 
   const awayIsDefending = teams.away.abbreviation === defendingTeam;
 
+  const scoreDescription = `${teams.away.abbreviation} ${score.away}, ${teams.home.abbreviation} ${score.home}. ${halfLabel[inning.half]} ${inning.ordinal}.${isExtraInnings ? ' Extra innings.' : ''}`;
+
   return (
     <div className="flex flex-col items-center gap-2">
       {/* Scores row */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4" aria-label={scoreDescription}>
         {/* Away */}
         <div className="flex flex-col items-center gap-0.5">
           <span
