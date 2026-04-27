@@ -1,0 +1,41 @@
+import type { GameUpdate } from '../game-update';
+import { Scoreboard } from './Scoreboard';
+import { OutsDisplay } from './OutsDisplay';
+import { RunsNeeded } from './RunsNeeded';
+import { BetweenInningsView } from './BetweenInningsView';
+import { BattingView } from './BattingView';
+
+interface GameViewProps {
+  update: GameUpdate;
+}
+
+export function GameView({ update }: GameViewProps) {
+  return (
+    <div className="flex flex-col gap-10">
+      <Scoreboard update={update} />
+      <TrackingWidget update={update} />
+    </div>
+  );
+}
+
+function TrackingWidget({ update }: { update: GameUpdate }) {
+  switch (update.trackingMode) {
+    case 'outs':
+      return <OutsDisplay outs={update.outs} />;
+    case 'runs':
+      // runsNeeded is guaranteed non-null when trackingMode === 'runs'
+      return <RunsNeeded runsNeeded={update.runsNeeded!} />;
+    case 'between-innings':
+      return <BetweenInningsView update={update} />;
+    case 'batting':
+      return <BattingView update={update} />;
+    case 'final':
+      // Phase 3 will replace this with <GameOverView />
+      return null;
+    default:
+      // Exhaustive check — TypeScript will error here if a new trackingMode is
+      // added to types.ts without a corresponding case above.
+      update.trackingMode satisfies never;
+      return null;
+  }
+}

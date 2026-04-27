@@ -1,27 +1,24 @@
 import { useSocket } from './hooks/useSocket';
 import { useGameStore } from './store/gameStore';
 import { ConnectionStatus } from './components/ConnectionStatus';
+import { GameView } from './components/GameView';
+import { IdleView } from './components/IdleView';
 
 export default function App() {
-  useSocket(); // establish connection, write to store
+  useSocket();
 
   const update = useGameStore((s) => s.update);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6">
-      <header className="flex items-center justify-between mb-8">
-        <h1 className="text-lg font-semibold tracking-wide">bball</h1>
+    <div className="min-h-screen bg-gray-950 text-white">
+      <header className="flex items-center justify-end p-4">
         <ConnectionStatus />
       </header>
 
-      <main>
-        {update ? (
-          <pre className="text-xs text-gray-300 bg-gray-900 rounded-lg p-4 overflow-auto">
-            {JSON.stringify(update, null, 2)}
-          </pre>
-        ) : (
-          <p className="text-gray-500">Waiting for game data…</p>
-        )}
+      <main className="flex justify-center px-6 pb-10">
+        <div className="w-full max-w-sm">
+          {update ? <GameView update={update} /> : <IdleView />}
+        </div>
       </main>
     </div>
   );
