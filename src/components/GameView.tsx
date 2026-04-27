@@ -20,7 +20,9 @@ export function GameView({ update }: GameViewProps) {
     <div className="flex flex-col gap-6">
       {update.isDelayed && <DelayBanner description={update.delayDescription} />}
       <Scoreboard update={update} />
-      <TrackingWidget update={update} />
+      <div key={update.trackingMode} className="animate-fade-in">
+        <TrackingWidget update={update} />
+      </div>
     </div>
   );
 }
