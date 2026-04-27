@@ -4,14 +4,21 @@ import { OutsDisplay } from './OutsDisplay';
 import { RunsNeeded } from './RunsNeeded';
 import { BetweenInningsView } from './BetweenInningsView';
 import { BattingView } from './BattingView';
+import { GameOverView } from './GameOverView';
+import { DelayBanner } from './DelayBanner';
 
 interface GameViewProps {
   update: GameUpdate;
 }
 
 export function GameView({ update }: GameViewProps) {
+  if (update.trackingMode === 'final') {
+    return <GameOverView update={update} />;
+  }
+
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-6">
+      {update.isDelayed && <DelayBanner description={update.delayDescription} />}
       <Scoreboard update={update} />
       <TrackingWidget update={update} />
     </div>
@@ -21,7 +28,14 @@ export function GameView({ update }: GameViewProps) {
 function TrackingWidget({ update }: { update: GameUpdate }) {
   switch (update.trackingMode) {
     case 'outs':
-      return <OutsDisplay outs={update.outs} />;
+      return (
+        <OutsDisplay
+          outs={update.outs}
+          totalOutsRemaining={update.totalOutsRemaining}
+          currentPitcher={update.currentPitcher}
+          pitchingChange={update.pitchingChange}
+        />
+      );
     case 'runs':
       // runsNeeded is guaranteed non-null when trackingMode === 'runs'
       return <RunsNeeded runsNeeded={update.runsNeeded!} />;
@@ -30,11 +44,11 @@ function TrackingWidget({ update }: { update: GameUpdate }) {
     case 'batting':
       return <BattingView update={update} />;
     case 'final':
-      // Phase 3 will replace this with <GameOverView />
+      // Handled above via early return — this branch is unreachable
       return null;
     default:
       // Exhaustive check — TypeScript will error here if a new trackingMode is
-      // added to types.ts without a corresponding case above.
+      // added to game-update.ts without a corresponding case above.
       update.trackingMode satisfies never;
       return null;
   }

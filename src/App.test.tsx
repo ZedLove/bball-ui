@@ -4,8 +4,9 @@ import App from './App';
 import { useGameStore } from './store/gameStore';
 import { makeUpdate } from './test/fixtures';
 
-// useSocket does real IO — mock it to a no-op for App tests
+// useSocket and useGameTimers create real side-effects — mock both to no-ops for App tests
 vi.mock('./hooks/useSocket', () => ({ useSocket: vi.fn() }));
+vi.mock('./hooks/useGameTimers', () => ({ useGameTimers: vi.fn() }));
 
 describe('App', () => {
   beforeEach(() => {

@@ -39,4 +39,28 @@ describe('GameView', () => {
     render(<GameView update={makeUpdate({ trackingMode: 'batting', battingTeam: 'NYM' })} />);
     expect(screen.getByText('NYM batting')).toBeInTheDocument();
   });
+
+  it('renders GameOverView for trackingMode final', () => {
+    render(<GameView update={makeUpdate({ trackingMode: 'final', gameStatus: 'Final' })} />);
+    expect(screen.getByText('FINAL')).toBeInTheDocument();
+  });
+
+  it('renders DelayBanner when isDelayed is true', () => {
+    render(
+      <GameView
+        update={makeUpdate({
+          trackingMode: 'outs',
+          isDelayed: true,
+          delayDescription: 'Delayed: Rain',
+        })}
+      />
+    );
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByText('Delayed: Rain')).toBeInTheDocument();
+  });
+
+  it('does not render DelayBanner when not delayed', () => {
+    render(<GameView update={makeUpdate({ trackingMode: 'outs', isDelayed: false })} />);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
 });

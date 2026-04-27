@@ -1,4 +1,5 @@
 import { useSocket } from './hooks/useSocket';
+import { useGameTimers } from './hooks/useGameTimers';
 import { useGameStore } from './store/gameStore';
 import { ConnectionStatus } from './components/ConnectionStatus';
 import { GameView } from './components/GameView';
@@ -6,6 +7,7 @@ import { IdleView } from './components/IdleView';
 
 export default function App() {
   useSocket();
+  useGameTimers();
 
   const update = useGameStore((s) => s.update);
 
