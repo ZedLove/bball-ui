@@ -27,7 +27,7 @@ describe('ThemeToggle', () => {
   it('renders with system icon by default', async () => {
     await loadAndRender();
     expect(
-      screen.getByRole('button', { name: /Theme: auto\. Tap to switch to dark\./i }),
+      screen.getByRole('button', { name: /Theme: auto\. Tap to switch to dark\./i })
     ).toBeInTheDocument();
   });
 
