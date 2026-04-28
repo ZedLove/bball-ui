@@ -5,6 +5,7 @@ import type { GameUpdate } from '../game-update';
 // Minimal valid GameUpdate fixture
 const mockUpdate: GameUpdate = {
   gameStatus: 'In Progress',
+  gamePk: 717171,
   teams: {
     away: { id: 141, name: 'Toronto Blue Jays', abbreviation: 'TOR' },
     home: { id: 121, name: 'New York Mets', abbreviation: 'NYM' },
@@ -18,19 +19,33 @@ const mockUpdate: GameUpdate = {
   delayDescription: null,
   isExtraInnings: false,
   scheduledInnings: 9,
-  trackingMode: 'outs',
+  trackingMode: 'live',
   outsRemaining: 2,
   totalOutsRemaining: 14,
   runsNeeded: null,
-  currentPitcher: { id: 800001, fullName: 'Max Fried' },
-  pitchingChange: false,
-  inningBreakLength: null,
+  currentPitcher: {
+    id: 800001,
+    fullName: 'Max Fried',
+    pitchesThrown: 43,
+    strikes: 28,
+    balls: 15,
+    usage: [],
+  },
+  pitchHistory: [],
+  upcomingPitcher: null,
+  atBat: null,
+  trackedTeamAbbr: 'TOR',
+  venueId: null,
+  venueFieldInfo: null,
 };
 
 describe('gameStore', () => {
   beforeEach(() => {
-    // Reset store to initial state before each test
-    useGameStore.setState({ update: null, connectionStatus: 'disconnected' });
+    useGameStore.setState({
+      update: null,
+      connectionStatus: 'disconnected',
+      pitchingChangeId: null,
+    });
   });
 
   it('starts with null update and disconnected status', () => {
@@ -53,5 +68,16 @@ describe('gameStore', () => {
   it('setConnectionStatus updates the connection state', () => {
     useGameStore.getState().setConnectionStatus('connected');
     expect(useGameStore.getState().connectionStatus).toBe('connected');
+  });
+
+  it('sets pitchingChangeId via setPitchingChange', () => {
+    useGameStore.getState().setPitchingChange(800001);
+    expect(useGameStore.getState().pitchingChangeId).toBe(800001);
+  });
+
+  it('clears pitchingChangeId on clearUpdate', () => {
+    useGameStore.setState({ pitchingChangeId: 800001 });
+    useGameStore.getState().clearUpdate();
+    expect(useGameStore.getState().pitchingChangeId).toBeNull();
   });
 });

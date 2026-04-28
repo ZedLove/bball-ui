@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import { useSocket } from './useSocket';
 import { useGameStore } from '../store/gameStore';
 import type { GameUpdate } from '../game-update';
+import type { GameEventsPayload } from '../game-events';
 
 // Build a controllable mock socket
 const mockOn = vi.fn();
@@ -17,7 +18,11 @@ vi.mock('socket.io-client', () => ({
 describe('useSocket', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useGameStore.setState({ update: null, connectionStatus: 'disconnected' });
+    useGameStore.setState({
+      update: null,
+      connectionStatus: 'disconnected',
+      pitchingChangeId: null,
+    });
   });
 
   it('calls io() with VITE_SOCKET_URL on mount', () => {
@@ -28,7 +33,6 @@ describe('useSocket', () => {
   it('sets connectionStatus to connected on connect event', () => {
     renderHook(() => useSocket());
 
-    // Find the 'connect' handler registered via socket.on
     const connectHandler = mockOn.mock.calls.find(([event]) => event === 'connect')?.[1];
     connectHandler?.();
 
@@ -49,10 +53,37 @@ describe('useSocket', () => {
 
     const gameUpdateHandler = mockOn.mock.calls.find(([event]) => event === 'game-update')?.[1];
 
-    const mockUpdate = { trackingMode: 'outs' } as GameUpdate;
+    const mockUpdate = { trackingMode: 'live' } as GameUpdate;
     gameUpdateHandler?.(mockUpdate);
 
-    expect(useGameStore.getState().update?.trackingMode).toBe('outs');
+    expect(useGameStore.getState().update?.trackingMode).toBe('live');
+  });
+
+  it('sets pitchingChangeId on pitching-substitution game-event', () => {
+    renderHook(() => useSocket());
+
+    const gameEventsHandler = mockOn.mock.calls.find(([event]) => event === 'game-events')?.[1];
+
+    const payload: GameEventsPayload = {
+      gamePk: 717171,
+      events: [
+        {
+          category: 'pitching-substitution',
+          gamePk: 717171,
+          atBatIndex: 15,
+          inning: 5,
+          halfInning: 'top',
+          battingTeam: 'TOR',
+          defendingTeam: 'NYM',
+          eventType: 'pitching_substitution',
+          description: 'Pitching Change: Blake Snell replaces Max Fried.',
+          player: { id: 800002, fullName: 'Blake Snell' },
+        },
+      ],
+    };
+    gameEventsHandler?.(payload);
+
+    expect(useGameStore.getState().pitchingChangeId).toBe(800002);
   });
 
   it('disconnects socket on unmount', () => {

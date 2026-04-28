@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { useGameStore } from '../store/gameStore';
 import type { GameUpdate } from '../game-update';
+import type { GameEventsPayload } from '../game-events';
 
 export function useSocket(): void {
   const setUpdate = useGameStore((s) => s.setUpdate);
   const setConnectionStatus = useGameStore((s) => s.setConnectionStatus);
+  const setPitchingChange = useGameStore((s) => s.setPitchingChange);
 
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
@@ -22,6 +24,14 @@ export function useSocket(): void {
     socket.on('disconnect', () => setConnectionStatus('reconnecting'));
 
     socket.on('game-update', (update: GameUpdate) => setUpdate(update));
+
+    socket.on('game-events', (payload: GameEventsPayload) => {
+      for (const event of payload.events) {
+        if (event.category === 'pitching-substitution') {
+          setPitchingChange(event.player.id);
+        }
+      }
+    });
 
     return () => {
       socket.disconnect();
