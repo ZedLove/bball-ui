@@ -193,4 +193,4 @@ Common scopes: `components`, `hooks`, `store`, `types`, `socket`, `config`, `dep
 Feature roadmap lives in `plans/next-steps.md`. Phase plans are in `plans/phase-*.md`. The active
 phase plan is the source of truth for scope, decisions, and task breakdown.
 
-Current status: Phase 4 complete. Phase 5 (`plans/phase-5-backend-alignment.md`) is next.
+Current status: Phase 5 complete. Phase 6 (`plans/phase-6-design-system-pwa.md`) is next.

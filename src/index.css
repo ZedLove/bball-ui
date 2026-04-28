@@ -1,5 +1,35 @@
 @import 'tailwindcss';
 
+/* ── Dark theme (default) ── */
+:root {
+  --c-bg: #1e1e1e;
+  --c-surface: #2d2d2d;
+  --c-surface-alt: #3a3a3a;
+  --c-fg: #d8d8d8;
+  --c-fg-muted: #9e9e9e;
+  --c-fg-faint: #6e6e6e;
+  --c-border: #4a4a4a;
+
+  --c-accent-outs: #f0c674;
+  --c-accent-runs: #cc6666;
+  --c-accent-batting: #8abeb7;
+  --c-accent-final: #b294bb;
+  --c-accent-warning: #de935f;
+  --c-accent-ok: #b5bd68;
+  --c-accent-error: #cc6666;
+}
+
+/* ── Light theme ── */
+.light {
+  --c-bg: #f5f0eb;
+  --c-surface: #ebe6e0;
+  --c-surface-alt: #e0dbd5;
+  --c-fg: #3f3f3f;
+  --c-fg-muted: #6e6e6e;
+  --c-fg-faint: #9e9e9e;
+  --c-border: #d0cbc5;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -25,6 +55,39 @@
 @theme {
   --animate-fade-in: fade-in 0.25s ease-out;
   --animate-slide-down: slide-down 0.2s ease-out;
+
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-alt: var(--c-surface-alt);
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-faint: var(--c-fg-faint);
+  --color-border: var(--c-border);
+
+  --color-accent-outs: var(--c-accent-outs);
+  --color-accent-runs: var(--c-accent-runs);
+  --color-accent-batting: var(--c-accent-batting);
+  --color-accent-final: var(--c-accent-final);
+  --color-accent-warning: var(--c-accent-warning);
+  --color-accent-ok: var(--c-accent-ok);
+  --color-accent-error: var(--c-accent-error);
+}
+
+/* ── Theme transition fallback ── */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Disable transitions during initial load to prevent flash */
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+  transition: none !important;
 }
 
 body {
