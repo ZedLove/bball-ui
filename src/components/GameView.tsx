@@ -19,8 +19,14 @@ export function GameView({ update }: GameViewProps) {
   return (
     <div className="flex flex-col gap-6">
       {update.isDelayed && <DelayBanner description={update.delayDescription} />}
-      <Scoreboard update={update} />
-      <div key={getDisplayMode(update)} className="animate-fade-in">
+      <div style={{ viewTransitionName: 'scoreboard' }}>
+        <Scoreboard update={update} />
+      </div>
+      <div
+        key={getDisplayMode(update)}
+        className="animate-fade-in"
+        style={{ viewTransitionName: 'tracking-content' }}
+      >
         <TrackingWidget update={update} />
       </div>
     </div>
