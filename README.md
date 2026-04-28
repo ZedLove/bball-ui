@@ -1,73 +1,92 @@
-# React + TypeScript + Vite
+# bball-ui
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A real-time MLB game tracking dashboard — a glanceable mobile-first SPA that connects to the [ZedLove/bball](https://github.com/ZedLove/bball) backend and renders live game state as it comes in.
 
-Currently, two official plugins are available:
+## What it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Shows the live score, inning, and the key stat for the tracked team: outs remaining (defending), runs needed (batting in extras), or current batting state
+- Displays current pitcher stats and flags pitching changes
+- Handles between-innings and game-over transitions
+- Supports dark and light themes (Zenburn-inspired palette) with system-preference detection and a manual toggle
+- Installable as a PWA — loads from service-worker cache offline and hydrates the last-known game state from `localStorage` on cold start
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Layer         | Choice                                            |
+| ------------- | ------------------------------------------------- |
+| Framework     | React 19 + TypeScript 6                           |
+| Build         | Vite 8                                            |
+| Styling       | Tailwind CSS v4 (Vite plugin)                     |
+| State         | Zustand v5 with `persist` + `devtools` middleware |
+| Real-time     | socket.io-client v4                               |
+| PWA           | vite-plugin-pwa (Workbox)                         |
+| Tests         | Vitest v4 + @testing-library/react                |
+| Lint / format | ESLint v10 + typescript-eslint + Prettier         |
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node 22+
+- The [ZedLove/bball](https://github.com/ZedLove/bball) backend running locally (defaults to `http://localhost:4000`)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+git clone https://github.com/ZedLove/bball-ui.git
+cd bball-ui
+npm install
+cp .env.example .env.local   # edit VITE_SOCKET_URL if the backend is on a different port
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Usage
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+```bash
+npm run dev          # dev server at http://localhost:5173
+npm run build        # type-check + Vite build → dist/
+npm run preview      # serve the production build locally
+npm run test:run     # run all tests once
+npm run lint         # ESLint
+npm run format       # Prettier auto-fix
+```
+
+## Environment variables
+
+| Variable          | Description                        | Default                 |
+| ----------------- | ---------------------------------- | ----------------------- |
+| `VITE_SOCKET_URL` | URL of the bball Socket.IO backend | `http://localhost:4000` |
+
+Set in `.env.local` for local development. In CI/production, set as a GitHub Actions secret named `VITE_SOCKET_URL`.
+
+## Deployment
+
+The app is deployed to GitHub Pages via GitHub Actions on every push to `main`. The built files are served from the `/bball-ui/` base path.
+
+To enable deployment in a fork:
+
+1. Go to **Settings → Pages → Source** and select **GitHub Actions**
+2. Add a `VITE_SOCKET_URL` secret under **Settings → Secrets → Actions**
+   import reactDom from 'eslint-plugin-react-dom';
 
 export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
+globalIgnores(['dist']),
+{
+files: ['**/*.{ts,tsx}'],
+extends: [
+// Other configs...
+// Enable lint rules for React
+reactX.configs['recommended-typescript'],
+// Enable lint rules for React DOM
+reactDom.configs.recommended,
+],
+languageOptions: {
+parserOptions: {
+project: ['./tsconfig.node.json', './tsconfig.app.json'],
+tsconfigRootDir: import.meta.dirname,
+},
+// other options...
+},
+},
 ]);
+
+```
+
 ```
