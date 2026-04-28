@@ -26,4 +26,28 @@ describe('BetweenInningsView', () => {
     );
     expect(screen.getByText('TOR batting next')).toBeInTheDocument();
   });
+
+  it('shows upcoming pitcher when available', () => {
+    render(
+      <BetweenInningsView
+        update={makeUpdate({
+          trackingMode: 'between-innings',
+          upcomingPitcher: { id: 800002, fullName: 'Blake Snell' },
+        })}
+      />
+    );
+    expect(screen.getByText('Pitching next: Blake Snell')).toBeInTheDocument();
+  });
+
+  it('does not show pitcher line when upcomingPitcher is null', () => {
+    render(
+      <BetweenInningsView
+        update={makeUpdate({
+          trackingMode: 'between-innings',
+          upcomingPitcher: null,
+        })}
+      />
+    );
+    expect(screen.queryByText(/Pitching next/)).not.toBeInTheDocument();
+  });
 });

@@ -1,20 +1,21 @@
+import type { PitcherGameStats } from '../game-update';
 import { PitcherInfo } from './PitcherInfo';
 
 interface OutsDisplayProps {
-  /** Current out count in the half-inning (0–2). outsRemaining = 3 - outs. */
+  /** Current out count in the half-inning (0–2). */
   outs: number;
+  /** 3 − outs, from the backend. */
+  outsRemaining: number;
   totalOutsRemaining: number | null;
-  currentPitcher: { id: number; fullName: string } | null;
-  pitchingChange: boolean;
+  currentPitcher: (PitcherGameStats & { id: number; fullName: string }) | null;
 }
 
 export function OutsDisplay({
   outs,
+  outsRemaining,
   totalOutsRemaining,
   currentPitcher,
-  pitchingChange,
 }: OutsDisplayProps) {
-  const outsRemaining = 3 - outs;
   const label = outsRemaining === 1 ? '1 out remaining' : `${outsRemaining} outs remaining`;
   const totalLabel =
     totalOutsRemaining === 1
@@ -42,7 +43,7 @@ export function OutsDisplay({
         {totalOutsRemaining !== null && <p className="text-gray-600 text-xs">{totalLabel}</p>}
       </div>
 
-      {currentPitcher && <PitcherInfo pitcher={currentPitcher} pitchingChange={pitchingChange} />}
+      {currentPitcher && <PitcherInfo pitcher={currentPitcher} />}
     </div>
   );
 }

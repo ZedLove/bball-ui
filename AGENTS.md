@@ -33,10 +33,11 @@ No coverage thresholds are enforced by CI — do not let coverage regress on new
 
 ```
 src/
-  game-update.ts     # GameUpdate, TeamInfo — backend socket contract; keep in sync with backend parser.ts
+  game-update.ts     # GameUpdate, TeamInfo, and all sub-types — backend socket contract
+  game-events.ts     # GameEventsPayload, PitchingSubstitutionEvent — game-events socket contract
   main.tsx           # React entry point
   App.tsx            # Root — calls useSocket() + useGameTimers(), routes GameView vs IdleView
-  index.css          # Global styles (Tailwind base)
+  index.css          # Global styles (Tailwind base, custom animations)
   components/        # Pure presentational React components
   hooks/             # React hooks (useSocket, useGameTimers)
   store/             # Zustand store — useGameStore (also exports ConnectionStatus type)
@@ -46,47 +47,65 @@ src/
 plans/               # Markdown feature plans — source of truth for roadmap
 ```
 
-**Component tree (current — end of Phase 2):**
+**Component tree (current — end of Phase 4):**
 
 ```
 App
 ├── ConnectionStatus
-├── GameView                     (update !== null)
-│   ├── Scoreboard               (always rendered)
+├── GameView                          (update !== null)
+│   ├── DelayBanner                   (isDelayed === true)
+│   ├── Scoreboard                    (always rendered)
 │   └── TrackingWidget (switch on trackingMode)
-│       ├── OutsDisplay          ('outs')
-│       ├── RunsNeeded           ('runs')
-│       ├── BetweenInningsView   ('between-innings')
-│       └── BattingView          ('batting')
-└── IdleView                     (update === null)
+│       ├── OutsDisplay               ('outs') ← includes PitcherInfo
+│       ├── RunsNeeded                ('runs')
+│       ├── BetweenInningsView        ('between-innings')
+│       ├── BattingView               ('batting')
+│       └── GameOverView              ('final' — early return)
+└── IdleView                          (update === null)
 ```
 
-Phase 3 will add `GameOverView`, `DelayBanner`, `PitcherInfo`, and `useGameTimers`.
+Phase 5 will consolidate `'outs'`/`'runs'`/`'batting'` into field-based sub-routing under `'live'`,
+add full pitcher stats, upcoming pitcher, and `game-events` pitching-change detection.
 
 **Key files:**
 
-- `src/game-update.ts` — `GameUpdate` + `TeamInfo`; keep in sync with the backend's `parser.ts`
+- `src/game-update.ts` — `GameUpdate`, `TeamInfo`, and all sub-types; keep in sync with `~/workspace/bball/src/server/socket-events.ts`
+- `src/game-events.ts` — `GameEventsPayload`, `PitchingSubstitutionEvent`; types for the `game-events` socket event
 - `src/store/gameStore.ts` — Zustand store; also exports `ConnectionStatus` type
-- `src/hooks/useSocket.ts` — creates the socket, wires `connect`/`disconnect`/`game-update` events
+- `src/hooks/useSocket.ts` — creates the socket, wires `connect`/`disconnect`/`game-update`/`game-events` events
 - `.env.local` / `.env.example` — `VITE_SOCKET_URL` (backend address); all env vars must be prefixed `VITE_`
 
 ## Backend Contract
 
-The backend emits one Socket.IO event: **`game-update`** (payload: `GameUpdate`).
+The backend emits two Socket.IO events:
 
-| `trackingMode`      | Emit frequency        | Meaning                                       |
-| ------------------- | --------------------- | --------------------------------------------- |
-| `'outs'`            | Every poll tick ~10 s | Target team defending                         |
-| `'runs'`            | Every poll tick ~10 s | Target team batting in extras, tied or losing |
-| `'batting'`         | Once on transition    | Target team batting in regulation             |
-| `'between-innings'` | Once on transition    | Half-inning ended; `inningBreakLength` set    |
-| `'final'`           | Once on transition    | Game ended                                    |
-| _(no event)_        | —                     | No active game                                |
+### `game-update` (payload: `GameUpdate`)
 
-`'batting'`, `'between-innings'`, and `'final'` are transition-only — the UI receives one event
-then goes silent. The design must be comfortable in that silence.
+| `trackingMode`      | Emit frequency        | Meaning                                    |
+| ------------------- | --------------------- | ------------------------------------------ |
+| `'live'`            | Every poll tick ~10 s | Game in active play (batting or defending) |
+| `'between-innings'` | Once on transition    | Half-inning ended                          |
+| `'final'`           | Once on transition    | Game ended                                 |
+| _(no event)_        | —                     | No active game                             |
 
-Socket event name strings are used directly (`'game-update'`, `'connect'`, `'disconnect'`).
+**`'live'` mode sub-routing** — the UI derives the sub-display from field presence:
+
+| Condition                | Display       | Meaning                                    |
+| ------------------------ | ------------- | ------------------------------------------ |
+| `outsRemaining !== null` | `OutsDisplay` | Target team defending                      |
+| `runsNeeded !== null`    | `RunsNeeded`  | Target team batting in extras, tied/losing |
+| Neither                  | `BattingView` | Target team batting in regulation          |
+
+`'between-innings'` and `'final'` are transition-only — the UI receives one event then goes
+silent. `'live'` emits continuously. The design must be comfortable in silence for transition modes.
+
+### `game-events` (payload: `GameEventsPayload`)
+
+Batched game events emitted per poll window. Includes pitching substitutions, plate appearances,
+and other in-game events. The frontend currently listens for `category: 'pitching-substitution'`
+to drive the pitching-change indicator.
+
+Socket event name strings are used directly (`'game-update'`, `'game-events'`, `'connect'`, `'disconnect'`).
 There is no `SOCKET_EVENTS` constant in this repo.
 
 ## Conventions
@@ -174,4 +193,4 @@ Common scopes: `components`, `hooks`, `store`, `types`, `socket`, `config`, `dep
 Feature roadmap lives in `plans/next-steps.md`. Phase plans are in `plans/phase-*.md`. The active
 phase plan is the source of truth for scope, decisions, and task breakdown.
 
-Current status: Phase 2 complete. Phase 3 (`plans/phase-3-advanced-features.md`) is next.
+Current status: Phase 4 complete. Phase 5 (`plans/phase-5-backend-alignment.md`) is next.

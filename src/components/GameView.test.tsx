@@ -4,22 +4,44 @@ import { makeUpdate } from '../test/fixtures';
 
 describe('GameView', () => {
   it('renders Scoreboard in all modes', () => {
-    render(<GameView update={makeUpdate({ trackingMode: 'outs' })} />);
+    render(<GameView update={makeUpdate()} />);
     expect(screen.getByText('TOR')).toBeInTheDocument();
   });
 
-  it('renders OutsDisplay for trackingMode outs', () => {
-    render(<GameView update={makeUpdate({ trackingMode: 'outs', outs: 1 })} />);
-    expect(screen.getByText('2 outs remaining')).toBeInTheDocument();
+  it('renders OutsDisplay when live and outsRemaining is set', () => {
+    render(<GameView update={makeUpdate({ trackingMode: 'live', outsRemaining: 2 })} />);
+    expect(screen.getByRole('img', { name: /out/i })).toBeInTheDocument();
   });
 
-  it('renders RunsNeeded for trackingMode runs', () => {
+  it('renders RunsNeeded when live and runsNeeded is set', () => {
     render(
       <GameView
-        update={makeUpdate({ trackingMode: 'runs', runsNeeded: 2, isExtraInnings: true })}
+        update={makeUpdate({
+          trackingMode: 'live',
+          outsRemaining: null,
+          totalOutsRemaining: null,
+          runsNeeded: 2,
+          currentPitcher: null,
+        })}
       />
     );
     expect(screen.getByText('runs needed to take the lead')).toBeInTheDocument();
+    expect(screen.getByLabelText('2 runs needed to take the lead')).toBeInTheDocument();
+  });
+
+  it('renders BattingView when live with neither outsRemaining nor runsNeeded', () => {
+    render(
+      <GameView
+        update={makeUpdate({
+          trackingMode: 'live',
+          outsRemaining: null,
+          totalOutsRemaining: null,
+          runsNeeded: null,
+          currentPitcher: null,
+        })}
+      />
+    );
+    expect(screen.getByText(/batting/i)).toBeInTheDocument();
   });
 
   it('renders BetweenInningsView for trackingMode between-innings', () => {
@@ -28,16 +50,10 @@ describe('GameView', () => {
         update={makeUpdate({
           trackingMode: 'between-innings',
           inning: { number: 5, half: 'Middle', ordinal: '5th' },
-          inningBreakLength: 120,
         })}
       />
     );
     expect(screen.getByText('Half inning over')).toBeInTheDocument();
-  });
-
-  it('renders BattingView for trackingMode batting', () => {
-    render(<GameView update={makeUpdate({ trackingMode: 'batting', battingTeam: 'NYM' })} />);
-    expect(screen.getByText('NYM batting')).toBeInTheDocument();
   });
 
   it('renders GameOverView for trackingMode final', () => {
@@ -49,7 +65,6 @@ describe('GameView', () => {
     render(
       <GameView
         update={makeUpdate({
-          trackingMode: 'outs',
           isDelayed: true,
           delayDescription: 'Delayed: Rain',
         })}
@@ -60,7 +75,7 @@ describe('GameView', () => {
   });
 
   it('does not render DelayBanner when not delayed', () => {
-    render(<GameView update={makeUpdate({ trackingMode: 'outs', isDelayed: false })} />);
+    render(<GameView update={makeUpdate({ isDelayed: false })} />);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

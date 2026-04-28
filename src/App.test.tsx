@@ -19,7 +19,7 @@ describe('App', () => {
   });
 
   it('shows GameView when update exists', () => {
-    useGameStore.setState({ update: makeUpdate({ trackingMode: 'outs', outs: 0 }) });
+    useGameStore.setState({ update: makeUpdate({ outs: 0, outsRemaining: 3 }) });
     render(<App />);
     expect(screen.getByText('3 outs remaining')).toBeInTheDocument();
   });

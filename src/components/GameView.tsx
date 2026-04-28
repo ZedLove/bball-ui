@@ -20,38 +20,50 @@ export function GameView({ update }: GameViewProps) {
     <div className="flex flex-col gap-6">
       {update.isDelayed && <DelayBanner description={update.delayDescription} />}
       <Scoreboard update={update} />
-      <div key={update.trackingMode} className="animate-fade-in">
+      <div key={getDisplayMode(update)} className="animate-fade-in">
         <TrackingWidget update={update} />
       </div>
     </div>
   );
 }
 
+function getDisplayMode(update: GameUpdate): string {
+  if (update.trackingMode !== 'live') return update.trackingMode;
+  if (update.outsRemaining !== null) return 'outs';
+  if (update.runsNeeded !== null) return 'runs';
+  return 'batting';
+}
+
 function TrackingWidget({ update }: { update: GameUpdate }) {
   switch (update.trackingMode) {
-    case 'outs':
-      return (
-        <OutsDisplay
-          outs={update.outs}
-          totalOutsRemaining={update.totalOutsRemaining}
-          currentPitcher={update.currentPitcher}
-          pitchingChange={update.pitchingChange}
-        />
-      );
-    case 'runs':
-      // runsNeeded is guaranteed non-null when trackingMode === 'runs'
-      return <RunsNeeded runsNeeded={update.runsNeeded!} />;
+    case 'live':
+      return <LiveModeContent update={update} />;
     case 'between-innings':
       return <BetweenInningsView update={update} />;
-    case 'batting':
-      return <BattingView update={update} />;
     case 'final':
       // Handled above via early return — this branch is unreachable
       return null;
     default:
-      // Exhaustive check — TypeScript will error here if a new trackingMode is
-      // added to game-update.ts without a corresponding case above.
       update.trackingMode satisfies never;
       return null;
   }
+}
+
+function LiveModeContent({ update }: { update: GameUpdate }) {
+  if (update.outsRemaining !== null) {
+    return (
+      <OutsDisplay
+        outs={update.outs}
+        outsRemaining={update.outsRemaining}
+        totalOutsRemaining={update.totalOutsRemaining}
+        currentPitcher={update.currentPitcher}
+      />
+    );
+  }
+
+  if (update.runsNeeded !== null) {
+    return <RunsNeeded runsNeeded={update.runsNeeded} />;
+  }
+
+  return <BattingView update={update} />;
 }

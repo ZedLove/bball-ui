@@ -35,7 +35,7 @@ describe('useGameTimers', () => {
   });
 
   it('does not start game-over timer for non-final modes', () => {
-    useGameStore.setState({ update: makeUpdate({ trackingMode: 'outs' }) });
+    useGameStore.setState({ update: makeUpdate({ trackingMode: 'live' }) });
     renderHook(() => useGameTimers());
 
     act(() => {
@@ -46,7 +46,7 @@ describe('useGameTimers', () => {
   });
 
   it('clears update after 30-minute inactivity safety net', () => {
-    useGameStore.setState({ update: makeUpdate({ trackingMode: 'outs' }) });
+    useGameStore.setState({ update: makeUpdate({ trackingMode: 'live' }) });
     renderHook(() => useGameTimers());
 
     act(() => {
@@ -56,7 +56,7 @@ describe('useGameTimers', () => {
   });
 
   it('resets the 30-min timer when a new update arrives', () => {
-    useGameStore.setState({ update: makeUpdate({ trackingMode: 'outs' }) });
+    useGameStore.setState({ update: makeUpdate({ trackingMode: 'live' }) });
     const { rerender } = renderHook(() => useGameTimers());
 
     // 25 minutes elapse — then a new update arrives
@@ -64,7 +64,7 @@ describe('useGameTimers', () => {
       vi.advanceTimersByTime(25 * 60 * 1_000);
     });
     act(() => {
-      useGameStore.setState({ update: makeUpdate({ trackingMode: 'outs', outs: 2 }) });
+      useGameStore.setState({ update: makeUpdate({ trackingMode: 'live', outs: 2 }) });
     });
     rerender();
 
