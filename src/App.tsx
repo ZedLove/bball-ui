@@ -2,6 +2,7 @@ import { useSocket } from './hooks/useSocket';
 import { useGameTimers } from './hooks/useGameTimers';
 import { useGameStore } from './store/gameStore';
 import { ConnectionStatus } from './components/ConnectionStatus';
+import { ThemeToggle } from './components/ThemeToggle';
 import { GameView } from './components/GameView';
 import { IdleView } from './components/IdleView';
 
@@ -13,8 +14,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <header className="flex items-center justify-end p-4">
+      <header className="flex items-center justify-between p-4">
         <ConnectionStatus />
+        <ThemeToggle />
       </header>
 
       <main className="flex justify-center px-6 pb-10">

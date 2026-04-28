@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach } from 'vitest';
+import { beforeEach, vi } from 'vitest';
 import App from './App';
 import { useGameStore } from './store/gameStore';
 import { makeUpdate } from './test/fixtures';
@@ -7,6 +7,15 @@ import { makeUpdate } from './test/fixtures';
 // useSocket and useGameTimers create real side-effects — mock both to no-ops for App tests
 vi.mock('./hooks/useSocket', () => ({ useSocket: vi.fn() }));
 vi.mock('./hooks/useGameTimers', () => ({ useGameTimers: vi.fn() }));
+
+// useTheme calls matchMedia — stub it for jsdom
+vi.mock('./hooks/useTheme', () => ({
+  useTheme: () => ({
+    resolvedTheme: 'dark' as const,
+    preference: 'system' as const,
+    cycleTheme: vi.fn(),
+  }),
+}));
 
 describe('App', () => {
   beforeEach(() => {
@@ -22,5 +31,10 @@ describe('App', () => {
     useGameStore.setState({ update: makeUpdate({ outs: 0, outsRemaining: 3 }) });
     render(<App />);
     expect(screen.getByText('3 outs remaining')).toBeInTheDocument();
+  });
+
+  it('renders ThemeToggle', () => {
+    render(<App />);
+    expect(screen.getByRole('button', { name: /theme/i })).toBeInTheDocument();
   });
 });
