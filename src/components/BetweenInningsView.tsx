@@ -14,10 +14,10 @@ export function BetweenInningsView({ update }: BetweenInningsViewProps) {
 
   return (
     <div className="flex flex-col items-center gap-2 text-center py-6">
-      <p className="text-xl text-gray-300 font-light">Half inning over</p>
-      <p className="text-sm text-gray-500">{teamAboutToBat} batting next</p>
+      <p className="text-xl text-fg font-light">Half inning over</p>
+      <p className="text-sm text-fg-faint">{teamAboutToBat} batting next</p>
       {upcomingPitcher && (
-        <p className="text-sm text-gray-500">Pitching next: {upcomingPitcher.fullName}</p>
+        <p className="text-sm text-fg-faint">Pitching next: {upcomingPitcher.fullName}</p>
       )}
     </div>
   );

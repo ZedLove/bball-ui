@@ -31,7 +31,7 @@ export function OutsDisplay({
             <div
               key={i}
               className={`h-12 w-12 rounded-full transition-all duration-300 ${
-                recorded ? 'bg-white' : 'border-2 border-white'
+                recorded ? 'bg-accent-outs' : 'border-2 border-accent-outs'
               }`}
             />
           );
@@ -39,8 +39,8 @@ export function OutsDisplay({
       </div>
 
       <div className="flex flex-col items-center gap-1.5">
-        <p className="text-gray-400 text-sm">{label}</p>
-        {totalOutsRemaining !== null && <p className="text-gray-600 text-xs">{totalLabel}</p>}
+        <p className="text-fg-muted text-sm">{label}</p>
+        {totalOutsRemaining !== null && <p className="text-fg-faint text-xs">{totalLabel}</p>}
       </div>
 
       {currentPitcher && <PitcherInfo pitcher={currentPitcher} />}

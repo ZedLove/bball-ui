@@ -26,36 +26,36 @@ export function Scoreboard({ update }: ScoreboardProps) {
         <div className="flex flex-col items-center gap-0.5">
           <span
             className={`text-xs font-semibold tracking-widest ${
-              awayIsDefending ? 'text-white' : 'text-gray-400'
+              awayIsDefending ? 'text-fg' : 'text-fg-muted'
             }`}
           >
             {teams.away.abbreviation}
           </span>
-          <span className="text-4xl font-mono font-bold text-white">{score.away}</span>
+          <span className="text-4xl font-mono font-bold text-fg">{score.away}</span>
         </div>
 
-        <span className="text-2xl text-gray-600 pb-1">—</span>
+        <span className="text-2xl text-fg-faint pb-1">—</span>
 
         {/* Home */}
         <div className="flex flex-col items-center gap-0.5">
           <span
             className={`text-xs font-semibold tracking-widest ${
-              !awayIsDefending ? 'text-white' : 'text-gray-400'
+              !awayIsDefending ? 'text-fg' : 'text-fg-muted'
             }`}
           >
             {teams.home.abbreviation}
           </span>
-          <span className="text-4xl font-mono font-bold text-white">{score.home}</span>
+          <span className="text-4xl font-mono font-bold text-fg">{score.home}</span>
         </div>
       </div>
 
       {/* Inning + extras */}
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-400">
+        <span className="text-sm text-fg-muted">
           {halfLabel[inning.half]} {inning.ordinal}
         </span>
         {isExtraInnings && (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider bg-amber-500 text-black">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider bg-accent-warning text-bg">
             EXTRA INNINGS
           </span>
         )}

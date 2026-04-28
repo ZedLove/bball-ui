@@ -30,8 +30,8 @@ describe('OutsDisplay', () => {
       <OutsDisplay outs={1} outsRemaining={2} totalOutsRemaining={null} currentPitcher={null} />
     );
     const circles = container.querySelectorAll('.rounded-full');
-    const filled = Array.from(circles).filter((c) => c.className.includes('bg-white'));
-    const hollow = Array.from(circles).filter((c) => c.className.includes('border-white'));
+    const filled = Array.from(circles).filter((c) => c.className.includes('bg-accent-outs'));
+    const hollow = Array.from(circles).filter((c) => c.className.includes('border-accent-outs'));
     expect(filled).toHaveLength(1);
     expect(hollow).toHaveLength(2);
   });
@@ -40,7 +40,7 @@ describe('OutsDisplay', () => {
     const { container } = render(
       <OutsDisplay outs={2} outsRemaining={1} totalOutsRemaining={null} currentPitcher={null} />
     );
-    const filled = container.querySelectorAll('.bg-white.rounded-full');
+    const filled = container.querySelectorAll('.bg-accent-outs.rounded-full');
     expect(filled).toHaveLength(2);
   });
 

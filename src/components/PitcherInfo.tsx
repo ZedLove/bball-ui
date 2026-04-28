@@ -10,11 +10,11 @@ export function PitcherInfo({ pitcher }: PitcherInfoProps) {
   const isPitchingChange = pitcher.id === pitchingChangeId;
 
   return (
-    <div className="flex flex-col items-center gap-1.5 text-xs text-gray-500">
+    <div className="flex flex-col items-center gap-1.5 text-xs text-fg-faint">
       <div className="flex items-center justify-center gap-2">
         <span>Pitching: {pitcher.fullName}</span>
         {isPitchingChange && (
-          <span className="px-1.5 py-0.5 rounded bg-amber-500 text-black text-[10px] font-bold tracking-wide">
+          <span className="px-1.5 py-0.5 rounded bg-accent-warning text-bg text-[10px] font-bold tracking-wide">
             NEW
           </span>
         )}
@@ -23,7 +23,7 @@ export function PitcherInfo({ pitcher }: PitcherInfoProps) {
         {pitcher.pitchesThrown} pitches · {pitcher.strikes} S · {pitcher.balls} B
       </p>
       {pitcher.usage.length > 0 && (
-        <p className="text-gray-600">
+        <p className="text-fg-faint">
           {pitcher.usage.map((u) => `${u.typeCode} ${u.pct}%`).join('  ')}
         </p>
       )}

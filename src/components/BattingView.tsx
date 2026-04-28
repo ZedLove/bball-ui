@@ -9,8 +9,8 @@ export function BattingView({ update }: BattingViewProps) {
 
   return (
     <div className="flex flex-col items-center gap-2 text-center py-6">
-      <p className="text-xl text-gray-300 font-light">{battingTeam} batting</p>
-      <p className="text-sm text-gray-500">Nothing to track right now</p>
+      <p className="text-xl text-accent-batting font-light">{battingTeam} batting</p>
+      <p className="text-sm text-fg-faint">Nothing to track right now</p>
     </div>
   );
 }

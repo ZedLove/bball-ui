@@ -13,7 +13,7 @@ export default function App() {
   const update = useGameStore((s) => s.update);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-bg text-fg">
       <header className="flex items-center justify-between p-4">
         <ConnectionStatus />
         <ThemeToggle />

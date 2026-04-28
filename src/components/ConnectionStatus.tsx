@@ -8,16 +8,16 @@ const labels: Record<ConnectionStatusType, string> = {
 };
 
 const dotColor: Record<ConnectionStatusType, string> = {
-  connected: 'bg-green-500',
-  reconnecting: 'bg-amber-400 animate-pulse',
-  disconnected: 'bg-red-500',
+  connected: 'bg-accent-ok',
+  reconnecting: 'bg-accent-warning animate-pulse',
+  disconnected: 'bg-accent-error',
 };
 
 export function ConnectionStatus() {
   const status = useGameStore((s) => s.connectionStatus);
 
   return (
-    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+    <div className="flex items-center gap-1.5 text-xs text-fg-muted">
       <span className={`h-2 w-2 rounded-full ${dotColor[status]}`} aria-hidden="true" />
       <span aria-live="polite">{labels[status]}</span>
     </div>

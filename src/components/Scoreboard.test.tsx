@@ -44,9 +44,9 @@ describe('Scoreboard', () => {
     render(<Scoreboard update={makeUpdate({ defendingTeam: 'NYM' })} />);
     const awayLabel = screen.getByText('TOR');
     const homeLabel = screen.getByText('NYM');
-    // Away (batting) should have text-gray-400; Home (defending) should have text-white
-    expect(awayLabel.className).toContain('text-gray-400');
-    expect(homeLabel.className).toContain('text-white');
+    // Away (batting) should have text-fg-muted; Home (defending) should have text-fg
+    expect(awayLabel.className).toContain('text-fg-muted');
+    expect(homeLabel.className).toContain('text-fg');
   });
 
   it('provides an accessible score description via aria-label', () => {
