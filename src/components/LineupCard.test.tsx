@@ -23,9 +23,9 @@ const sampleLineup: LineupEntry[] = [
 ];
 
 describe('LineupCard', () => {
-  it('renders nothing when lineup is empty', () => {
-    const { container } = render(<LineupCard lineup={[]} currentBatterId={null} />);
-    expect(container.firstChild).toBeNull();
+  it('renders empty state message when lineup is empty', () => {
+    render(<LineupCard lineup={[]} currentBatterId={null} />);
+    expect(screen.getAllByText('Lineup unavailable').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders a collapsible toggle button on mobile', () => {
@@ -33,11 +33,8 @@ describe('LineupCard', () => {
     expect(screen.getByRole('button', { name: /lineup/i })).toBeInTheDocument();
   });
 
-  it('lineup table is hidden by default on mobile (collapsed)', () => {
+  it('lineup toggle button starts collapsed', () => {
     render(<LineupCard lineup={sampleLineup} currentBatterId={null} />);
-    // Before expansion, player names should not be visible via the mobile table
-    // The desktop table is always rendered (hidden via CSS), but accessible
-    // We test the toggle button's aria-expanded state
     const toggle = screen.getByRole('button', { name: /lineup/i });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
@@ -49,9 +46,16 @@ describe('LineupCard', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
   });
 
+  it('collapses the mobile lineup on second click', async () => {
+    render(<LineupCard lineup={sampleLineup} currentBatterId={null} />);
+    const toggle = screen.getByRole('button', { name: /lineup/i });
+    await userEvent.click(toggle);
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('highlights the current batter row with aria-current', () => {
     render(<LineupCard lineup={sampleLineup} currentBatterId={3} />);
-    // aria-current="true" is set on the current batter's row
     const currentRows = screen
       .getAllByRole('row')
       .filter((r) => r.getAttribute('aria-current') === 'true');
@@ -60,7 +64,6 @@ describe('LineupCard', () => {
 
   it('shows batting slot numbers', () => {
     render(<LineupCard lineup={sampleLineup} currentBatterId={null} />);
-    // Desktop table always renders — slot numbers visible
     const slotCells = screen.getAllByText('1');
     expect(slotCells.length).toBeGreaterThanOrEqual(1);
   });
@@ -79,5 +82,11 @@ describe('LineupCard', () => {
     const lineup = [makeEntry({ seasonOps: null })];
     render(<LineupCard lineup={lineup} currentBatterId={null} />);
     expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows H/AB column data', () => {
+    const lineup = [makeEntry({ hits: 2, atBats: 4 })];
+    render(<LineupCard lineup={lineup} currentBatterId={null} />);
+    expect(screen.getAllByText('2/4').length).toBeGreaterThanOrEqual(1);
   });
 });
