@@ -17,6 +17,11 @@ vi.mock('./hooks/useTheme', () => ({
   }),
 }));
 
+// StrikeZonePanel renders SVG via @visx/scale — mock it for App-level test isolation
+vi.mock('./components/StrikeZonePanel', () => ({
+  StrikeZonePanel: () => <div data-testid="strike-zone-panel" />,
+}));
+
 describe('App', () => {
   beforeEach(() => {
     useGameStore.setState({ update: null, connectionStatus: 'connected' });

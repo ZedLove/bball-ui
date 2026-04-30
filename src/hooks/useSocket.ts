@@ -8,6 +8,7 @@ export function useSocket(): void {
   const setUpdate = useGameStore((s) => s.setUpdate);
   const setConnectionStatus = useGameStore((s) => s.setConnectionStatus);
   const setPitchingChange = useGameStore((s) => s.setPitchingChange);
+  const addEvents = useGameStore((s) => s.addEvents);
 
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
@@ -26,6 +27,10 @@ export function useSocket(): void {
     socket.on('game-update', (update: GameUpdate) => setUpdate(update));
 
     socket.on('game-events', (payload: GameEventsPayload) => {
+      // Guard against late/out-of-order events from a previous game
+      const currentGamePk = useGameStore.getState().update?.gamePk;
+      if (currentGamePk !== undefined && payload.gamePk !== currentGamePk) return;
+      addEvents(payload.events);
       for (const event of payload.events) {
         if (event.category === 'pitching-substitution') {
           setPitchingChange(event.player.id);

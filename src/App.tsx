@@ -20,7 +20,7 @@ export default function App() {
       </header>
 
       <main className="flex justify-center px-6 pb-10">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-sm sm:max-w-2xl">
           {update ? <GameView update={update} /> : <IdleView />}
         </div>
       </main>

@@ -1,6 +1,12 @@
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import { GameView } from './GameView';
 import { makeUpdate } from '../test/fixtures';
+
+// Mock StrikeZonePanel to avoid ParentSize jsdom issues
+vi.mock('./StrikeZonePanel', () => ({
+  StrikeZonePanel: () => <div data-testid="strike-zone-panel" />,
+}));
 
 describe('GameView', () => {
   it('renders Scoreboard in all modes', () => {
@@ -29,7 +35,7 @@ describe('GameView', () => {
     expect(screen.getByLabelText('2 runs needed to take the lead')).toBeInTheDocument();
   });
 
-  it('renders BattingView when live with neither outsRemaining nor runsNeeded', () => {
+  it('renders StrikeZonePanel in live mode', () => {
     render(
       <GameView
         update={makeUpdate({
@@ -41,7 +47,41 @@ describe('GameView', () => {
         })}
       />
     );
-    expect(screen.getByText(/batting/i)).toBeInTheDocument();
+    expect(screen.getByTestId('strike-zone-panel')).toBeInTheDocument();
+  });
+
+  it('renders PitcherInfo when currentPitcher is set in live mode (defending)', () => {
+    render(<GameView update={makeUpdate({ trackingMode: 'live', outsRemaining: 2 })} />);
+    expect(screen.getByText('Pitching: Max Fried')).toBeInTheDocument();
+  });
+
+  it('renders PitcherInfo when currentPitcher is set in live mode (batting)', () => {
+    render(
+      <GameView
+        update={makeUpdate({
+          trackingMode: 'live',
+          outsRemaining: null,
+          totalOutsRemaining: null,
+          runsNeeded: null,
+        })}
+      />
+    );
+    expect(screen.getByText('Pitching: Max Fried')).toBeInTheDocument();
+  });
+
+  it('does not render PitcherInfo when currentPitcher is null', () => {
+    render(
+      <GameView
+        update={makeUpdate({
+          trackingMode: 'live',
+          outsRemaining: null,
+          totalOutsRemaining: null,
+          runsNeeded: null,
+          currentPitcher: null,
+        })}
+      />
+    );
+    expect(screen.queryByText(/Pitching:/)).not.toBeInTheDocument();
   });
 
   it('renders BetweenInningsView for trackingMode between-innings', () => {

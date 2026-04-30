@@ -15,8 +15,21 @@
   --c-accent-batting: #8abeb7;
   --c-accent-final: #b294bb;
   --c-accent-warning: #de935f;
+  --c-accent-warm: #d4a060;
   --c-accent-ok: #b5bd68;
   --c-accent-error: #cc6666;
+
+  --c-pitch-ff: #d63333;
+  --c-pitch-si: #e06030;
+  --c-pitch-fc: #e88060;
+  --c-pitch-ch: #40a040;
+  --c-pitch-fs: #2d8040;
+  --c-pitch-sl: #d4b030;
+  --c-pitch-st: #c0a028;
+  --c-pitch-cu: #3080d0;
+  --c-pitch-kc: #309098;
+  --c-pitch-kn: #8060c0;
+  --c-pitch-other: #888888;
 }
 
 /* ── Light theme ── */
@@ -69,8 +82,21 @@
   --color-accent-batting: var(--c-accent-batting);
   --color-accent-final: var(--c-accent-final);
   --color-accent-warning: var(--c-accent-warning);
+  --color-accent-warm: var(--c-accent-warm);
   --color-accent-ok: var(--c-accent-ok);
   --color-accent-error: var(--c-accent-error);
+
+  --color-pitch-ff: var(--c-pitch-ff);
+  --color-pitch-si: var(--c-pitch-si);
+  --color-pitch-fc: var(--c-pitch-fc);
+  --color-pitch-ch: var(--c-pitch-ch);
+  --color-pitch-fs: var(--c-pitch-fs);
+  --color-pitch-sl: var(--c-pitch-sl);
+  --color-pitch-st: var(--c-pitch-st);
+  --color-pitch-cu: var(--c-pitch-cu);
+  --color-pitch-kc: var(--c-pitch-kc);
+  --color-pitch-kn: var(--c-pitch-kn);
+  --color-pitch-other: var(--c-pitch-other);
 }
 
 /* ── Theme transition fallback ── */
