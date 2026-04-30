@@ -65,6 +65,20 @@
   }
 }
 
+@keyframes spray-dot-pulse {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @theme {
   --animate-fade-in: fade-in 0.25s ease-out;
   --animate-slide-down: slide-down 0.2s ease-out;
