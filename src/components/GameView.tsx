@@ -87,7 +87,11 @@ function TrackingWidget({ update }: { update: GameUpdate }) {
 function LiveModeContent({ update }: { update: GameUpdate }) {
   return (
     <div className="flex flex-col gap-4">
-      <StrikeZonePanel atBat={update.atBat} pitchHistory={update.pitchHistory} />
+      <StrikeZonePanel
+        atBat={update.atBat}
+        pitchHistory={update.pitchHistory}
+        venueFieldInfo={update.venueFieldInfo}
+      />
       {update.currentPitcher && <PitcherInfo pitcher={update.currentPitcher} />}
       <LiveModeContext update={update} />
     </div>

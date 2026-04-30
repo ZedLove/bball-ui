@@ -1,19 +1,60 @@
 import { useState, useEffect, useRef } from 'react';
-import type { AtBatState, PitchEvent } from '../game-update';
+import type { AtBatState, BattedBallData, PitchEvent, VenueFieldInfo } from '../game-update';
 import type { PitchFilter } from './PitchFilterToggle';
 import { PitchFilterToggle } from './PitchFilterToggle';
 import { StrikeZone } from './StrikeZone';
 import { PitchSequenceList } from './PitchSequenceList';
+import { SprayChart } from './SprayChart';
+import { BattedBallOverlay } from './BattedBallOverlay';
 
 interface StrikeZonePanelProps {
   atBat: AtBatState | null;
   pitchHistory: PitchEvent[];
+  venueFieldInfo: VenueFieldInfo | null;
 }
 
-export function StrikeZonePanel({ atBat, pitchHistory: rawPitchHistory }: StrikeZonePanelProps) {
+export function StrikeZonePanel({
+  atBat,
+  pitchHistory: rawPitchHistory,
+  venueFieldInfo,
+}: StrikeZonePanelProps) {
   // Guard against null/undefined from stale persisted state or unexpected backend values
   const pitchHistory: PitchEvent[] = rawPitchHistory ?? [];
   const [filter, setFilter] = useState<PitchFilter>('at-bat');
+
+  // ── Zone/spray state machine ─────────────────────────────────────────────
+  const [displayMode, setDisplayMode] = useState<'zone' | 'spray'>('zone');
+  const [inPlayHitData, setInPlayHitData] = useState<BattedBallData | null>(null);
+  // Track which in-play pitch has been "seen" to avoid re-triggering on re-renders
+  const lastInPlayRef = useRef<number | null>(null);
+
+  // Transition zone → spray when the latest pitch in the sequence is in-play
+  useEffect(() => {
+    const seq = atBat?.pitchSequence ?? [];
+    const lastPitch = seq.at(-1);
+    if (!lastPitch?.isInPlay) return;
+    if (lastPitch.pitchNumber === lastInPlayRef.current) return;
+    lastInPlayRef.current = lastPitch.pitchNumber;
+    setInPlayHitData(lastPitch.hitData);
+    setDisplayMode('spray');
+  }, [atBat]);
+
+  // Auto-revert to zone after 8 seconds
+  useEffect(() => {
+    if (displayMode !== 'spray') return;
+    const timer = setTimeout(() => setDisplayMode('zone'), 8000);
+    return () => clearTimeout(timer);
+  }, [displayMode]);
+
+  // Revert immediately when new pitch data arrives after the in-play pitch
+  useEffect(() => {
+    if (displayMode !== 'spray') return;
+    const seq = atBat?.pitchSequence ?? [];
+    const lastPitch = seq.at(-1);
+    if (atBat === null || seq.length === 0 || (lastPitch !== undefined && !lastPitch.isInPlay)) {
+      setDisplayMode('zone');
+    }
+  }, [atBat, displayMode]);
 
   // Persist the last known at-bat so the zone stays populated between plate appearances
   const lastAtBatRef = useRef<AtBatState | null>(null);
@@ -65,22 +106,31 @@ export function StrikeZonePanel({ atBat, pitchHistory: rawPitchHistory }: Strike
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="flex sm:flex-row flex-col gap-4 w-full sm:items-start">
-        <div className="w-full max-w-[240px] mx-auto sm:mx-0 sm:flex-1 sm:min-w-0">
-          <StrikeZone
-            pitches={rawPitches}
-            batter={batter}
-            count={count}
-            showNumbers={showNumbers}
-          />
+      {displayMode === 'spray' ? (
+        <div className="animate-fade-in w-full flex flex-col gap-2">
+          <SprayChart hitData={inPlayHitData} venueFieldInfo={venueFieldInfo} />
+          {inPlayHitData !== null && <BattedBallOverlay hitData={inPlayHitData} />}
         </div>
-        {rawPitches.length > 0 && (
-          <div className="w-full max-w-[240px] mx-auto sm:mx-0 sm:w-36 shrink-0 max-h-64 overflow-y-auto">
-            <PitchSequenceList pitches={pitchesForList} showNumbers={showNumbers} />
+      ) : (
+        <div className="animate-fade-in flex sm:flex-row flex-col gap-4 w-full sm:items-start">
+          <div className="w-full max-w-[240px] mx-auto sm:mx-0 sm:flex-1 sm:min-w-0">
+            <StrikeZone
+              pitches={rawPitches}
+              batter={batter}
+              count={count}
+              showNumbers={showNumbers}
+            />
           </div>
-        )}
-      </div>
-      <PitchFilterToggle value={activeFilter} onChange={setFilter} options={availableOptions} />
+          {rawPitches.length > 0 && (
+            <div className="w-full max-w-[240px] mx-auto sm:mx-0 sm:w-36 shrink-0 max-h-64 overflow-y-auto">
+              <PitchSequenceList pitches={pitchesForList} showNumbers={showNumbers} />
+            </div>
+          )}
+        </div>
+      )}
+      {displayMode === 'zone' && (
+        <PitchFilterToggle value={activeFilter} onChange={setFilter} options={availableOptions} />
+      )}
     </div>
   );
 }
