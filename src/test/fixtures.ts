@@ -173,3 +173,14 @@ export function makeVenueFieldInfo(overrides: Partial<VenueFieldInfo> = {}): Ven
     ...overrides,
   };
 }
+
+export function makePitchInPlay(overrides: Partial<PitchEvent> = {}): PitchEvent {
+  return makePitchEvent({
+    call: 'In play, run(s)',
+    isInPlay: true,
+    isStrike: false,
+    isBall: false,
+    hitData: makeBattedBall(),
+    ...overrides,
+  });
+}
