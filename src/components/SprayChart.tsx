@@ -28,10 +28,10 @@ function buildAriaLabel(hitData: BattedBallData | null): string {
   if (hitData.coordinates === null) return 'Spray chart: ball in play, location unavailable';
 
   const metrics: string[] = [];
-  if (hitData.trajectory !== null) metrics.push(formatTrajectory(hitData.trajectory));
-  if (hitData.launchSpeed !== null) metrics.push(`${hitData.launchSpeed} mph exit velocity`);
-  if (hitData.launchAngle !== null) metrics.push(`${hitData.launchAngle}° launch angle`);
-  if (hitData.totalDistance !== null) metrics.push(`${hitData.totalDistance} feet`);
+  if (hitData.trajectory != null) metrics.push(formatTrajectory(hitData.trajectory));
+  if (hitData.launchSpeed != null) metrics.push(`${hitData.launchSpeed} mph exit velocity`);
+  if (hitData.launchAngle != null) metrics.push(`${hitData.launchAngle}° launch angle`);
+  if (hitData.totalDistance != null) metrics.push(`${hitData.totalDistance} feet`);
 
   if (metrics.length === 0) return 'Spray chart: ball in play';
   return `Spray chart: ${metrics.join(', ')}`;
@@ -60,8 +60,7 @@ export function SprayChart({ hitData, venueFieldInfo }: SprayChartProps) {
     dotY = SPRAY_HOME_Y - feetY * scale;
   }
 
-  const trajectoryLabel =
-    hitData?.trajectory != null ? formatTrajectory(hitData.trajectory) : null;
+  const trajectoryLabel = hitData?.trajectory != null ? formatTrajectory(hitData.trajectory) : null;
 
   return (
     <div role="img" aria-label={ariaLabel} className="relative">

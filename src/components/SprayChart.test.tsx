@@ -50,24 +50,31 @@ describe('SprayChart', () => {
     expect(
       screen.getByRole('img', {
         name: /Spray chart: Line Drive, 105.2 mph exit velocity/i,
-      }),
+      })
     ).toBeInTheDocument();
   });
 
   it('has "location unavailable" in aria-label when coordinates are null', () => {
     render(<SprayChart hitData={makeBattedBall({ coordinates: null })} venueFieldInfo={null} />);
-    expect(
-      screen.getByRole('img', { name: /location unavailable/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /location unavailable/i })).toBeInTheDocument();
   });
 
   it('renders trajectory label text when trajectory is provided', () => {
-    render(<SprayChart hitData={makeBattedBall({ trajectory: 'fly_ball' })} venueFieldInfo={null} />);
+    render(
+      <SprayChart hitData={makeBattedBall({ trajectory: 'fly_ball' })} venueFieldInfo={null} />
+    );
     expect(screen.getByText('Fly Ball')).toBeInTheDocument();
   });
 
   it('does not render trajectory label when trajectory is null', () => {
     render(<SprayChart hitData={makeBattedBall({ trajectory: null })} venueFieldInfo={null} />);
     expect(screen.queryByText(/Ball|Drive|Ground|Popup/)).not.toBeInTheDocument();
+  });
+
+  it('does not crash when backend sends undefined for trajectory', () => {
+    const hitData = makeBattedBall({ trajectory: undefined as unknown as null });
+    expect(() =>
+      render(<SprayChart hitData={hitData} venueFieldInfo={null} />),
+    ).not.toThrow();
   });
 });
