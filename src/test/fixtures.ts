@@ -5,6 +5,8 @@ import type {
   PitchTrackingData,
   RunnerState,
   LineupEntry,
+  BattedBallData,
+  VenueFieldInfo,
 } from '../game-update';
 
 export function makeUpdate(overrides: Partial<GameUpdate> = {}): GameUpdate {
@@ -145,4 +147,40 @@ export function makeLineupEntry(overrides: Partial<LineupEntry> = {}): LineupEnt
     seasonOps: '.832',
     ...overrides,
   };
+}
+
+export function makeBattedBall(overrides: Partial<BattedBallData> = {}): BattedBallData {
+  return {
+    launchSpeed: 105.2,
+    launchAngle: 18,
+    totalDistance: 380,
+    trajectory: 'line_drive',
+    hardness: 'hard',
+    location: '8',
+    coordinates: { coordX: 150, coordY: 80 },
+    ...overrides,
+  };
+}
+
+export function makeVenueFieldInfo(overrides: Partial<VenueFieldInfo> = {}): VenueFieldInfo {
+  return {
+    venueId: 3289,
+    leftLine: 335,
+    leftCenter: 358,
+    center: 408,
+    rightCenter: 375,
+    rightLine: 330,
+    ...overrides,
+  };
+}
+
+export function makePitchInPlay(overrides: Partial<PitchEvent> = {}): PitchEvent {
+  return makePitchEvent({
+    call: 'In play, run(s)',
+    isInPlay: true,
+    isStrike: false,
+    isBall: false,
+    hitData: makeBattedBall(),
+    ...overrides,
+  });
 }
