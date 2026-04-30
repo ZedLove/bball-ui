@@ -321,8 +321,10 @@ export interface GameUpdate {
   runsNeeded: number | null;
   /**
    * Pitcher currently on the mound during active play.
+   * Sourced from linescore.defense.pitcher — non-null when the tracked team is
+   * defending (trackingMode='live', outsRemaining !== null). Null when the tracked
+   * team is batting, during between-innings, or during final transitions.
    * Includes computed stats (populated by the scheduler each tick).
-   * null when not defending or during between-innings.
    */
   currentPitcher: (PitcherGameStats & { id: number; fullName: string }) | null;
   /**

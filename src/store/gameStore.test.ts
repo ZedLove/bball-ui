@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useGameStore } from './gameStore';
 import type { GameUpdate } from '../game-update';
+import type { GameEvent } from '../game-events';
 
 // Minimal valid GameUpdate fixture
 const mockUpdate: GameUpdate = {
@@ -47,6 +48,7 @@ describe('gameStore', () => {
       connectionStatus: 'disconnected',
       pitchingChangeId: null,
       lastUpdatedAt: null,
+      gameEvents: [],
     });
   });
 
@@ -104,7 +106,7 @@ describe('gameStore', () => {
     useGameStore.getState().setConnectionStatus('connected');
     useGameStore.getState().setPitchingChange(800001);
 
-    const stored = JSON.parse(localStorage.getItem('game-store') ?? '{}');
+    const stored = JSON.parse(localStorage.getItem('game-store-v2') ?? '{}');
     expect(stored.state).toHaveProperty('update');
     expect(stored.state).toHaveProperty('lastUpdatedAt');
     expect(stored.state).not.toHaveProperty('connectionStatus');
@@ -116,7 +118,7 @@ describe('gameStore', () => {
     const staleTimestamp = Date.now() - FOUR_HOURS - 1000;
 
     localStorage.setItem(
-      'game-store',
+      'game-store-v2',
       JSON.stringify({
         state: { update: mockUpdate, lastUpdatedAt: staleTimestamp },
         version: 0,
@@ -136,7 +138,7 @@ describe('gameStore', () => {
     const recentTimestamp = Date.now() - 1000;
 
     localStorage.setItem(
-      'game-store',
+      'game-store-v2',
       JSON.stringify({
         state: { update: mockUpdate, lastUpdatedAt: recentTimestamp },
         version: 0,
@@ -149,5 +151,107 @@ describe('gameStore', () => {
       expect(freshStore.getState().lastUpdatedAt).toBe(recentTimestamp);
     });
     expect(freshStore.getState().update).toEqual(mockUpdate);
+  });
+
+  it('addEvents prepends new events to gameEvents', () => {
+    const event1: GameEvent = {
+      category: 'pitching-substitution',
+      gamePk: 717171,
+      atBatIndex: 1,
+      inning: 1,
+      halfInning: 'top',
+      battingTeam: 'TOR',
+      defendingTeam: 'NYM',
+      eventType: 'pitching_substitution',
+      description: 'Max Fried pitching',
+      player: { id: 800001, fullName: 'Max Fried' },
+    };
+    useGameStore.getState().addEvents([event1]);
+    expect(useGameStore.getState().gameEvents).toHaveLength(1);
+    expect(useGameStore.getState().gameEvents[0]).toEqual(event1);
+  });
+
+  it('addEvents caps gameEvents at MAX_EVENTS (20)', () => {
+    const events: GameEvent[] = Array.from({ length: 15 }, (_, i) => ({
+      category: 'pitching-substitution' as const,
+      gamePk: 717171,
+      atBatIndex: i,
+      inning: 1,
+      halfInning: 'top' as const,
+      battingTeam: 'TOR',
+      defendingTeam: 'NYM',
+      eventType: 'pitching_substitution',
+      description: `Event ${i}`,
+      player: { id: i, fullName: `Pitcher ${i}` },
+    }));
+    useGameStore.getState().addEvents(events);
+    // Add 10 more
+    const more: GameEvent[] = Array.from({ length: 10 }, (_, i) => ({
+      ...events[0],
+      atBatIndex: 100 + i,
+      description: `Extra ${i}`,
+    }));
+    useGameStore.getState().addEvents(more);
+    expect(useGameStore.getState().gameEvents).toHaveLength(20);
+  });
+
+  it('setUpdate clears gameEvents when gamePk changes', () => {
+    const event: GameEvent = {
+      category: 'pitching-substitution',
+      gamePk: 717171,
+      atBatIndex: 1,
+      inning: 1,
+      halfInning: 'top',
+      battingTeam: 'TOR',
+      defendingTeam: 'NYM',
+      eventType: 'pitching_substitution',
+      description: 'Pitcher in',
+      player: { id: 1, fullName: 'Pitcher A' },
+    };
+    useGameStore.getState().setUpdate(mockUpdate);
+    useGameStore.getState().addEvents([event]);
+    expect(useGameStore.getState().gameEvents).toHaveLength(1);
+
+    // New game
+    useGameStore.getState().setUpdate({ ...mockUpdate, gamePk: 999999 });
+    expect(useGameStore.getState().gameEvents).toHaveLength(0);
+  });
+
+  it('clearUpdate clears gameEvents', () => {
+    const event: GameEvent = {
+      category: 'pitching-substitution',
+      gamePk: 717171,
+      atBatIndex: 1,
+      inning: 1,
+      halfInning: 'top',
+      battingTeam: 'TOR',
+      defendingTeam: 'NYM',
+      eventType: 'pitching_substitution',
+      description: 'Pitcher in',
+      player: { id: 1, fullName: 'Pitcher A' },
+    };
+    useGameStore.getState().addEvents([event]);
+    useGameStore.getState().clearUpdate();
+    expect(useGameStore.getState().gameEvents).toHaveLength(0);
+  });
+
+  it('gameEvents are not persisted to localStorage', () => {
+    const event: GameEvent = {
+      category: 'pitching-substitution',
+      gamePk: 717171,
+      atBatIndex: 1,
+      inning: 1,
+      halfInning: 'top',
+      battingTeam: 'TOR',
+      defendingTeam: 'NYM',
+      eventType: 'pitching_substitution',
+      description: 'Pitcher in',
+      player: { id: 1, fullName: 'Pitcher A' },
+    };
+    useGameStore.getState().setUpdate(mockUpdate);
+    useGameStore.getState().addEvents([event]);
+
+    const stored = JSON.parse(localStorage.getItem('game-store-v2') ?? '{}');
+    expect(stored.state).not.toHaveProperty('gameEvents');
   });
 });
